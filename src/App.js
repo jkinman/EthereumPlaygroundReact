@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import configureStore from './stores';
 import logo from './logo.svg';
 import './App.css';
+import PollEthereum from './components/smart/PollEthereum';
 
 const store = configureStore();
 
@@ -17,9 +18,7 @@ class App extends Component {
             <img src={logo} className="App-logo" alt="logo" />
             <h1 className="App-title">Welcome to React</h1>
           </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload.
-          </p>
+          <PollEthereum />
         </div>
       </Provider>
     );
