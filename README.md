@@ -1,3 +1,24 @@
+# Ethereum Sandbox starting template
+
+This was built with create react app and the below Heroku guide. 
+This will get your app online with Heroku getting information on the Ethereum blockchain in a redux app shell in 5 minutes.
+
+
+* npm install -g create-react-app
+* create-react-app my-app
+* cd my-app
+* git init
+* heroku create -b https://github.com/mars/create-react-app-buildpack.git
+* git add .
+* git commit -m "react-create-app on Heroku"
+* git push heroku master
+* heroku open
+
+https://blog.heroku.com/deploying-react-with-zero-configuration
+
+
+## create react app docs below for referance
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
