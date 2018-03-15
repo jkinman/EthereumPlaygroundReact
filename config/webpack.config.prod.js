@@ -133,6 +133,28 @@ module.exports = {
         // match the requirements. When no loader matches it will fall
         // back to the "file" loader at the end of the loader list.
         oneOf: [
+          {
+            test: /\.scss$/,
+            include: [paths.appSrc, paths.appNodeModules],
+            use: [
+              {
+                loader: require.resolve('style-loader'),
+                options: {
+                  sourceMap: shouldUseSourceMap
+                }
+              },
+              {
+                loader: require.resolve('css-loader'),
+              },
+              require.resolve('resolve-url-loader'),
+              {
+                loader: require.resolve('sass-loader'),
+                options: {
+                  sourceMap: shouldUseSourceMap
+                }
+              }
+            ]
+          },
           // "url" loader works just like "file" loader but it also embeds
           // assets smaller than specified size as data URLs to avoid requests.
           {

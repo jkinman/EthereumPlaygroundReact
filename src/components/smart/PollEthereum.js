@@ -12,9 +12,10 @@ class PollEthereum extends Component {
         super( props, context)
         this.ethereumService = new EthereumService( this.props.actions.addNewBlock )
     }
+
     render() {
         const {actions, ethereum} = this.props;
-        return <PrintEthereum actions={actions} ethereum={ethereum}/>;
+        return <PrintEthereum actions={actions} ethereum={ethereum} ethService={ this.ethereumService } />;
     }
 }
 
@@ -24,7 +25,7 @@ function mapStateToProps(state) {
 }
 
   function mapDispatchToProps(dispatch) {
-    const actions = { addNewBlock:ReduxActions.addNewBlock };
+    const actions = { ...ReduxActions  };
     const actionMap = { actions: bindActionCreators(actions, dispatch) };
     return actionMap;
 }

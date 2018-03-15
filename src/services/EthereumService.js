@@ -1,4 +1,3 @@
-
 import Web3Service from './Web3Service'
 
 class EthereumService {
@@ -118,7 +117,7 @@ class EthereumService {
       loadTransactions( block ) {
         let retVal = []
         block.transactions.map( (transaction) => {
-          this.web3.eth.getTransaction(transaction, (err, data) => {
+          Web3Service.web3.eth.getTransaction(transaction, (err, data) => {
             if( err ){
               console.error( err )
               return
@@ -129,8 +128,8 @@ class EthereumService {
         return retVal
       }
 
-      loadTransaction( transaction, outVal ) {
-        return this.web3.eth.getTransaction(transaction)
+      loadTransaction( transaction, cb ) {
+        return Web3Service.web3.eth.getTransaction(transaction, cb)
       }
     
       processBlock (data) {
@@ -143,7 +142,7 @@ class EthereumService {
             // let pixels = this.convertBlockToRGB(block)
             // block.image = this.makeBlockImage( pixels )
             block.pixelArray = this.convertBlockToRGB(block, true)
-            block.loadTransaction = this.loadTransaction.bind(this)
+            // block.loadTransaction = this.loadTransaction.bind(this)
             this.addBlock( block )
         })
          
