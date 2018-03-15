@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-// import { addNewBlock } from '../../actions/';
 import * as ReduxActions from '../../actions'
+import EthereumService from '../../services/EthereumService'
 
 import PrintEthereum from '../dumb/PrintEthereum'
 
 class PollEthereum extends Component {
+
+    constructor( props, context ) {
+        super( props, context)
+        this.ethereumService = new EthereumService( this.props.actions.addNewBlock )
+    }
     render() {
         const {actions, ethereum} = this.props;
         return <PrintEthereum actions={actions} ethereum={ethereum}/>;
     }
-    
 }
 
 function mapStateToProps(state) {

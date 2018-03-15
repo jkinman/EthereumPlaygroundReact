@@ -1,18 +1,28 @@
 import Web3 from 'web3';
 
-export default class Web3Service {
+class Web3ServiceInstance {
 
-    static getWeb3() {
-        return this.web3
+    constructor() {
+        this._type = 'Web3ServiceInstance'
+        this._web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/mRUmnxLJW2t5fZP6WfDN"))
     }
 
-    static getBlockNumber() {
-        return this.web3.getBlockNumber()
+     getBlockNumber( cb ) {
+        this._web3.eth.getBlockNumber(cb)
     }
-    static connected() {
-        return this.web3.eth
+
+     connected() {
+        return this._web3.eth
     }
+  
+    get web3() {
+        return this._web3
+      }
+    
+    set web3( val ) {
+        this._web3 = val
+    }
+    
 }
-
-
-Web3Service.web3 = new Web3(new Web3.providers.HttpProvider(process.env.REACT_APP_ETHEREUM_PROVIDER));
+  
+  export default new Web3ServiceInstance();

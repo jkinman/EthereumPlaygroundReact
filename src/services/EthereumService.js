@@ -1,19 +1,20 @@
+
 import Web3Service from './Web3Service'
 
-
-class EthBlockchainSync {
+class EthereumService {
 
     constructor( addBlock ) {
-        this.addBlock = addBlock
+
+      this.addBlock = addBlock        
         this.pollEthereum()
     }
 
     pollEthereum() {
         setTimeout( this.pollEthereum.bind(this), 4000 )
         if( !Web3Service.connected() ) return
-        
-        Web3Service.getBlockNumber()
-        .then( (data) => {
+
+        Web3Service.getBlockNumber( (err, data) => {
+          if(err)console.error(err)
           if( !this.blockNumber ){
             for( let i = data - 3 ; i < data ; i++ ) {
               this.processBlock(i)
@@ -21,7 +22,6 @@ class EthBlockchainSync {
           }
           else if( this.blockNumber !== data) this.processBlock(data)
         })
-        .error(console.error)    
 
     }
     
@@ -136,8 +136,9 @@ class EthBlockchainSync {
       processBlock (data) {
         this.blockNumber = data
         
-        var currBlockObj = this.web3.eth.getBlock(data)
-        .then( (block) => {
+        var currBlockObj = Web3Service.web3.eth.getBlock(data, 
+          (err, block) => {
+            if(err) console.error(err)
             if(!block) return
             // let pixels = this.convertBlockToRGB(block)
             // block.image = this.makeBlockImage( pixels )
@@ -145,9 +146,9 @@ class EthBlockchainSync {
             block.loadTransaction = this.loadTransaction.bind(this)
             this.addBlock( block )
         })
-        .error(console.error)       
+         
       }
     
 }
 
-export default EthBlockchainSync;
+export default EthereumService;
