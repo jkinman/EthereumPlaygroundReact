@@ -1,19 +1,35 @@
 import React from 'react';
 import './ethereum.scss';
+import { Easing, Tween, autoPlay } from 'es6-tween'
 
 import TransactionBlob from './TransactionBlob'
 
-const BlockEnhanced = props => {
+class BlockEnhanced extends React.Component{
+
+  zoomIn() {
+  }
+   onClick(e) {
+     debugger
+   }
+
+  render() {
 
   return(
-    <div className="block">
-    <h1 onClick={ () => props.showBlock(props.block) } >{`Block # ${props.block.number}`}</h1>
-    <div key={props.index} className="blockEnhanced">
-      {props.block.pixelArray.map( (transaction, i) => 
-      <TransactionBlob pixels={transaction} showTransactionDetails={props.showTransactionDetails} toolTipCB={ props.toolTipCB } transaction={props.block.transactions[i]} key={i} /> )}
+    <div className="block" onClick={() => this.props.select(this)}>
+    <h1 onClick={ () => this.props.showBlock(this.props.block) } >{`Block # ${this.props.block.number}`}</h1>
+    <div key={this.props.index} className="blockEnhanced">
+      {this.props.block.pixelArray.map( (transaction, i) => 
+      <TransactionBlob 
+      pixels={transaction} 
+      showTransactionDetails={this.props.showTransactionDetails} 
+      toolTipCB={ this.props.toolTipCB } 
+      transaction={this.props.block.transactions[i]} 
+      key={i} /> )}
     </div>
     </div>
     )
   }
+}
+  
 
   export default BlockEnhanced;

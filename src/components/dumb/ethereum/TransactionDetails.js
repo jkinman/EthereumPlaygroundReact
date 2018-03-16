@@ -13,7 +13,7 @@ class TransactionDetails extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('click', this.close.bind(this))
+    // document.addEventListener('click', this.close.bind(this))
   }
 
   open( transaction ) {

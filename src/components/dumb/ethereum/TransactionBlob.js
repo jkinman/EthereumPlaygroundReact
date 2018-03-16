@@ -6,9 +6,9 @@ const TransactionBlob = props => {
 
     return (
       <div 
-        onMouseEnter={ () => props.toolTipCB( props.transaction ) } 
-        onMouseLeave={ () => props.toolTipCB( false ) }
-        onClick={ ()=> props.showTransactionDetails(props.transaction) }      
+        // onMouseEnter={ () => props.toolTipCB( props.transaction ) } 
+        // onMouseLeave={ () => props.toolTipCB( false ) }
+        // onClick={ ()=> props.showTransactionDetails(props.transaction) }      
         className="TransactionBlob" data-tip={ `Transaction: ${props.transaction}` }>
         {props.pixels.map( (pixel, i) => 
             <DomPixel key={ i } pixel={pixel} /> )

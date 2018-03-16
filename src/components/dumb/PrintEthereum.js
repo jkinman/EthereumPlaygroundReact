@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom'
 import './ethereum/ethereum.scss'
 
 //TODO remove this dependency
@@ -8,7 +9,7 @@ import EthereumService from '../../services/EthereumService'
 import BlockEnhanced from './ethereum/BlockEnhanced'
 import BlockDetails from './ethereum/BlockDetails'
 import TransactionDetails from './ethereum/TransactionDetails'
-
+import BlockInspector from './ethereum/BlockInspector/BlockInspector'
 
 export default class PrintEthereum extends Component {
 
@@ -40,7 +41,26 @@ export default class PrintEthereum extends Component {
           this.refs.hoverInfo.style.display = 'block'
         }
       }
-    
+      setCurrentBlock( event, block )  {
+        console.log( event)
+        console.log( block)
+      }
+
+      setCurrentContext(element){
+        debugger;
+
+        // obj.currentTarget.style.width = '1000px'
+        // obj.currentTarget.style.height = '1000px'
+        // ReactDOM.render(
+        // <BlockInspector element={ } ><h1>HELLO</h1></BlockInspector>, 
+        // this.refs.exploreWindow)
+        // ReactDOM.render( element, this.refs.exploreWindow)
+      // this.activeInspector.activate()
+        // obj.currentTarget.style.zoom = '3'
+        // this.componentViewStack.push(obj)
+        this.refs.exploreWindow.setElement(element) 
+      }
+
     render() {
     
         return (
@@ -50,9 +70,7 @@ export default class PrintEthereum extends Component {
             <h3>Click the blocks to inspect</h3>
 
             <h3>Each group of squares represents one transaction, each group of transactions is a block.</h3>
-            
             <p ref="data"></p>
-            <div className="transtooltip" ref="hoverInfo">hover</div>
     
             <div className="blockContainer">
               { this.props.ethereum && 
@@ -61,9 +79,9 @@ export default class PrintEthereum extends Component {
                     return (
                     <div key={i} >
                       <BlockEnhanced
+                      select={this.setCurrentContext.bind(this)}
                       showBlock={ this.showDetails.bind(this) }
-                      showTransactionDetails={this.showTransactionDetails.bind(this)}
-                      toolTipCB={ this.showToolTip.bind(this) } 
+                      // toolTipCB={ this.showToolTip.bind(this) } 
                       block={block} 
                       tilt={this.state.hoverId == i} 
                       index={i} key={i+'block'} />
@@ -72,6 +90,9 @@ export default class PrintEthereum extends Component {
                   }
                 )}
             </div>
+            <BlockInspector ref="exploreWindow"></BlockInspector>
+            {/* <BlockInspector ref="viewRenderer"></BlockInspector> */}
+            <div  />
               <BlockDetails ref="blockDetails" />
               <TransactionDetails ref="TransactionDetails" />
           </div>
