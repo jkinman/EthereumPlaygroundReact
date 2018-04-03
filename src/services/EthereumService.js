@@ -24,7 +24,7 @@ class EthereumService {
     Web3Service.getBlockNumber((err, data) => {
       if (err) console.error(err);
       if (!this.blockNumber) {
-        for (let i = data - 10; i < data; i++) {
+        for (let i = data - 1; i < data; i++) {
           this.processBlock(i, true)
         }
       } else if (this.blockNumber !== data) this.processBlock(data, true);
