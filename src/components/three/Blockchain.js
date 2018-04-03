@@ -1,11 +1,15 @@
 import React, { Component } from "react";
+import ParticleBurst from "../../utils/ParticleBurst";
+
 import "aframe";
 import "aframe-environment-component";
 import "aframe-animation-component";
 import "aframe-event-set-component";
+// import "aframe-forcegraph-component";
 import "aframe-sprite-label";
 import "aframe-effects";
 import "./AframeLowpoly";
+import "./AframeForceGraph-component";
 
 import { Entity, Scene } from "aframe-react";
 
@@ -22,6 +26,15 @@ class Blockchain extends Component {
     };
   }
 
+  shouldComponentUpdate(newProps, newState) {
+    if (
+      newProps.ethereum.latestBlock.number !==
+      this.props.ethereum.latestBlock.number
+    ) {
+      return true;
+    }
+    return false;
+  }
   _handleClick() {
     this.setState({
       colorIndex: (this.state.colorIndex + 1) % COLORS.length
@@ -29,8 +42,20 @@ class Blockchain extends Component {
   }
   // none, default, contact, egypt, checkerboard, forest, goaland, yavapai, goldmine, threetowers, poison, arches, tron, japan, dream, volcano, starry, osiris
   render() {
+    const nodes = this.props.ethereum.blockArray.map(e => ({
+      id: e.number,
+      hash: e.hash
+    }));
+    let links = [];
+    this.props.ethereum.blockArray.forEach((e, i, a) => {
+      if (a.length > i + 1) {
+        links.push({ source: e.number, target: a[i + 1].number });
+      }
+    });
+
     return (
       <Scene
+        stats
         effects="bloom, film, fxaa"
         fxaa
         bloom={{
@@ -40,18 +65,22 @@ class Blockchain extends Component {
           sIntensity: 0.15,
           nIntensity: 0.25
         }}
-        // environment={{
-        //   preset: "tron",
-        //   dressing: "none",
-        //   seed: 1,
-        //   lightPosition: { x: 200.0, y: 1.0, z: -50.0 },
-        //   fog: 0.8,
-        //   ground: "flat",
-        //   groundYScale: 5.0,
-        //   groundTexture: "none",
-        //   groundColor: "#755b5c",
-        //   grid: "none"
-        // }}
+        // embedded
+        environment={{
+          preset: "starry",
+          skyType: 'atmosphere',
+          lighting: 'distant',
+          flatShading: false,
+          dressing: "none",
+          seed: 1,
+          lightPosition: { x: 200.0, y: 1.0, z: -50.0 },
+          fog: 0,
+          ground: "none",
+          groundYScale: 2.0,
+          groundTexture: "none",
+          groundColor: "#755b5c",
+          grid: "1x1"
+        }}
       >
         <Entity
           primitive="a-light"
@@ -77,7 +106,13 @@ class Blockchain extends Component {
           intensity={0.3}
         />
 
-        <Entity primitive="a-camera" look-controls>
+        <Entity primitive="a-camera" 
+        look-controls={{pointerLockEnabled:false}}
+        position="0 15 100"
+        far={20000}
+        fov={80}
+        zoom={0.9}
+        >
           <Entity
             primitive="a-cursor"
             cursor={{ fuse: false }}
@@ -97,7 +132,9 @@ class Blockchain extends Component {
           />
         </Entity>
 
-        {this.props.ethereum &&
+        <Entity forcegraph={{ nodes: nodes, links: links }} class="clickable" />
+
+        {/* {this.props.ethereum &&
           this.props.ethereum.blockArray.map((block, i) => {
             return (
               <Entity
@@ -142,7 +179,7 @@ class Blockchain extends Component {
               />
 
             );
-          })}
+          })} */}
       </Scene>
     );
   }
