@@ -1,11 +1,39 @@
+// This service manages syncronizing blocks from the ethereum block chain into the applicaiton
+// Then manages a series of web workers to systematically pull in data that makes up the blocks
+
 import Web3Service from "./Web3Service";
 
-import EthereumTransactionWorker from "worker-loader!./EthereumTransactionWorker.js";
+import EthereumTransactionWorker from "./EthereumTransaction.worker.js";
 
 class EthereumService {
   constructor(addBlock) {
     this.addBlock = addBlock;
     this.pollEthereum();
+    this.startWebworker();
+  }
+
+  startWebworker() {
+    // initialize the web worker to crawl the blockahin and geet data without jamming the FE
+    this.ethereumTransactionWorker = new Worker(EthereumTransactionWorker);
+    this.ethereumTransactionWorker.addEventListener(
+      "message",
+      function(e) {
+        console.log("Worker said: ", e.data);
+      },
+      false
+    );
+    this.ethereumTransactionWorker.postMessage("hello world");
+  }
+
+  get blockchain() {
+    return this._blockchain;
+    this.ethereumTransactionWorker.postMessage(
+      "lets set the blockchain crawling"
+    );
+  }
+
+  set blockchain(blockchain) {
+    this._blockchain = blockchain;
   }
 
   pollEthereum() {
@@ -15,7 +43,7 @@ class EthereumService {
     Web3Service.getBlockNumber((err, data) => {
       if (err) console.error(err);
       if (!this.blockNumber) {
-        for (let i = data - 3; i < data; i++) {
+        for (let i = data - 10; i < data; i++) {
           this.processBlock(i);
         }
       } else if (this.blockNumber !== data) this.processBlock(data);

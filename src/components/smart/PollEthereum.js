@@ -10,7 +10,11 @@ class PollEthereum extends Component {
 
     constructor( props, context ) {
         super( props, context)
-        this.ethereumService = new EthereumService( this.props.actions.addNewBlock )
+        this.ethereumService = new EthereumService(this.props.actions.addNewBlock )
+    }
+
+    componentDidMount() {
+        this.ethereumService.blockchain = this.props.ethereum
     }
 
     render() {
