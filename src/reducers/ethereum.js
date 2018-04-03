@@ -1,6 +1,6 @@
-import {ADD_NEW_BLOCK} from '../actions/const';
+import { ADD_NEW_BLOCK } from "../actions/const";
 
-const initialState = { blockArray:[], latestBlock:0};
+const initialState = { blockArray: [], latestBlock: 0 };
 
 function reducer(state = initialState, action) {
   /* Keep the reducer clean - do not mutate the original state. */
@@ -8,12 +8,14 @@ function reducer(state = initialState, action) {
 
   switch (action.type) {
     case ADD_NEW_BLOCK: {
-      nextState.blockArray.push( action.parameter)
-      nextState.blockArray = nextState.blockArray.sort((a,b)=> b.number - a.number)
-      while( nextState.blockArray.length > 20 ) {
-        nextState.blockArray.pop()
+      nextState.blockArray.push(action.parameter);
+      nextState.blockArray = nextState.blockArray.sort(
+        (a, b) => b.number - a.number
+      );
+      while (nextState.blockArray.length > 20) {
+        nextState.blockArray.pop();
       }
-      nextState.latestBlock = action.parameter
+      nextState.latestBlock = action.parameter;
       return nextState;
     }
 

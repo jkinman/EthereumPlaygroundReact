@@ -47,18 +47,18 @@ export default class PrintEthereum extends Component {
 
   setCurrentContext(element) {
     let fixedStyle = {
-      position: 'fixed',
-      left: '50%',
-      top: '50%',
-      transformOrigin: 'center',
-      transform: 'translate(-50%,-50%)',
-    }
+      position: "fixed",
+      left: "50%",
+      top: "50%",
+      transformOrigin: "center",
+      transform: "translate(-50%,-50%)"
+    };
     this.selectedElement = ReactDOM.render(
-      <BlockEnhanced {...element.props} style={fixedStyle}/>,
+      <BlockEnhanced {...element.props} style={fixedStyle} />,
       this.refs.currentElement
     );
 
-   this.selectedElement.zoomIn();
+    this.selectedElement.zoomIn();
   }
 
   render() {
