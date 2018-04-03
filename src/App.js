@@ -27,6 +27,7 @@ class App extends Component {
             </header>
             <PollEthereum />
           </div>
+          <div id="spawnedthings" />
         </div>
       </Provider>
     );

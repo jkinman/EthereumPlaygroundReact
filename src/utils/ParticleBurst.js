@@ -1,21 +1,29 @@
 import * as $ from 'jquery'
 
-let things = [];
+import './ParticalBurst.css'
+
+const SPEED_FACTOR = 0.7
 
 class ParticleBurst {
 
 	constructor( settings) {
 		this.settings = settings
+		this.things = []
 	}
 
-  spawnRandom(event) {
+	burst( spawnPoint = {x:250, y:0}) {
+		this.spawnRandom( spawnPoint )
+		this.tick()
+	}
+
+  spawnRandom(spawnPoint) {
     let i = Math.round(Math.random() * 15);
     for (; i > 0; i--) {
-      spawnThing(event);
+      this.spawnThing(spawnPoint);
     }
   }
 
-  spawnThing(event) {
+  spawnThing(spawnPoint) {
     let thing = $(document.createElement("span"));
     let addedEl = $("#spawnedthings").append(thing);
 
@@ -28,8 +36,8 @@ class ParticleBurst {
       .text("*");
 
     $(thing).css({
-      transform: `translate(${event.pageX}px,${
-        event.pageY
+      transform: `translate(${spawnPoint.x}px,${
+        spawnPoint.y
       }px) scale(${Math.random() * 3 - 1.5})`,
       color: `rgb(${r},${g},${b})`
     });
@@ -40,23 +48,23 @@ class ParticleBurst {
       speedy: Math.random() * 5 - 12,
       speedz: Math.random() * 0.2 - 0.1,
       scale: 1.5,
-      x: event.pageX,
-      y: event.pageY,
+      x: spawnPoint.x,
+      y: spawnPoint.y,
       spin: Math.random() * 10 - 5,
       rotation: 0
     };
-    things.push(thingInstance);
+    this.things.push(thingInstance);
   }
 
   tick() {
     let windowHeight = $(window).height();
-    things.forEach((e, i, a) => {
+    this.things.forEach((e, i, a) => {
       //apply acceleration
-      e.speedy += 1;
-      e.scale += e.speedz;
-      e.y += e.speedy;
-      e.x += e.speedx;
-      e.rotation += e.spin;
+      e.speedy += 1 * SPEED_FACTOR;
+      e.scale += e.speedz * SPEED_FACTOR;
+      e.y += e.speedy * SPEED_FACTOR;
+      e.x += e.speedx * SPEED_FACTOR;
+      e.rotation += e.spin * SPEED_FACTOR;
       e.el.css({
         transform: `translate(${Math.round(e.x)}px,${Math.round(
           e.y
@@ -72,8 +80,8 @@ class ParticleBurst {
         a.splice(i, 1);
       }
     });
-
-    window.requestAnimationFrame(this.tick.bind(this));
+		if( this.things.length )
+    	window.requestAnimationFrame(this.tick.bind(this));
   }
 }
 

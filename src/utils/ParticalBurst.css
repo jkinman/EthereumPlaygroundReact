@@ -1,0 +1,16 @@
+#spawnedthings {
+	position: fixed;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+	pointer-events: none;
+}
+.spawnedthing{
+	position: absolute;
+	color:white;
+	-webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
