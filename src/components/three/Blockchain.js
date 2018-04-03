@@ -23,7 +23,6 @@ class Blockchain extends Component {
   }
 
   _handleClick() {
-    console.log("clicked sphere");
     this.setState({
       colorIndex: (this.state.colorIndex + 1) % COLORS.length
     });
@@ -104,21 +103,22 @@ class Blockchain extends Component {
               <Entity
                 class="clickable"
                 lowpoly={{
-                  color: COLORS[this.state.colorIndex],
+                color: "#3333dd",
+                // color: COLORS[this.state.colorIndex],
                   nodes: true,
                   opacity: 0.15,
                   wireframe: true,
                   radius:1,
                 position:{ x: 4 * i, y: 0, z: -8 }
                 }}
-                primitive="a-octahedron"
+                primitive="a-box"
                 detail={2}
                 events={{
                   click: console.log
                 }}
                 radius={1}
                 position={{ x: 4 * i, y: 0, z: -8 }}
-                color="#FAFAF1"
+                color="#3333dd"
                 animation__rotate={{
                   property: "rotation",
                   dur: 60000,

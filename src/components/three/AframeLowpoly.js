@@ -19,7 +19,7 @@ AFRAME.registerComponent('lowpoly', {
     // Get the ref of the object to which the component is attached
     const obj = this.el.getObject3D('mesh')
     const { radius } = this.data
-    const myRadius = radius * 1.6
+    const myRadius = radius * 1.3
 
     // Grab the reference to the main WebGL scene
     const scene = document.querySelector('a-scene').object3D
