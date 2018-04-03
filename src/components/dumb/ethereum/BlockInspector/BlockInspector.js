@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom'
 import '../ethereum.scss';
-import { Easing, Tween, autoPlay } from 'es6-tween'
 
 
 class BlockInspector extends React.Component{
