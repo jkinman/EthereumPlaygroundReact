@@ -5,35 +5,39 @@ import TransactionBlob from "./TransactionBlob";
 
 import "./ethereum.scss";
 
-const tweens = []
+const tweens = [];
 
 class BlockEnhanced extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      style: {...props.style}
+      style: { ...props.style }
     };
   }
 
   zoomIn() {
-    let tweenData = { percent: 0}
-    tweens.push ( anime({
-      targets: tweenData,
-      percent: 100,
-      update: () => {
-        this.setZoomPercent( tweenData.percent )
-      }
-    }))
+    let tweenData = { percent: 0 };
+    tweens.push(
+      anime({
+        targets: tweenData,
+        percent: 100,
+        update: () => {
+          this.setZoomPercent(tweenData.percent);
+        }
+      })
+    );
   }
 
   zoomOut() {
-    this.setState({ style: { ...this.state.style, display:'none' } });
+    this.setState({ style: { ...this.state.style, display: "none" } });
   }
 
-  setZoomPercent( percent ){
-    const FULL_SIZE = 2
-    this.setStyle( { transform: `scale(${FULL_SIZE * (percent/100)}, ${FULL_SIZE * (percent/100)})` } )
-
+  setZoomPercent(percent) {
+    const FULL_SIZE = 2;
+    this.setStyle({
+      transform: `scale(${FULL_SIZE * (percent / 100)}, ${FULL_SIZE *
+        (percent / 100)})`
+    });
   }
 
   setStyle(styleParam) {
@@ -43,16 +47,17 @@ class BlockEnhanced extends React.Component {
 
   render() {
     return (
-      <div
-        className="block"
-        onClick={() => this.props.select(this)}
-        style={this.state.style}
-      >
-        <h1>{`Block # ${this.props.block.number}`}</h1>
-        {/* <h1 onClick={ () => this.props.showBlock(this.props.block) } >{`Block # ${this.props.block.number}`}</h1> */}
-        <div key={this.props.index} className="blockEnhanced">
+      <div className="block blockEnhanced container" style={this.state.style}>
+        <div className="row">
+          <div className="col-sm-12">
+            <h1>{`Block # ${this.props.block.number}`}</h1>
+          </div>
+        </div>
+
+        <div key={this.props.index} className=" row">
           {this.props.block.pixelArray.map((transaction, i) => (
             <TransactionBlob
+              select={this.props.select}
               pixels={transaction}
               showTransactionDetails={this.props.showTransactionDetails}
               toolTipCB={this.props.toolTipCB}

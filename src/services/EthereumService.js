@@ -3,33 +3,14 @@
 
 import Web3Service from "./Web3Service";
 
-import EthereumTransactionWorker from "./EthereumTransaction.worker.js";
-
 class EthereumService {
   constructor(addBlock) {
     this.addBlock = addBlock;
     this.pollEthereum();
-    this.startWebworker();
-  }
-
-  startWebworker() {
-    // initialize the web worker to crawl the blockahin and geet data without jamming the FE
-    this.ethereumTransactionWorker = new Worker(EthereumTransactionWorker);
-    this.ethereumTransactionWorker.addEventListener(
-      "message",
-      function(e) {
-        console.log("Worker said: ", e.data);
-      },
-      false
-    );
-    this.ethereumTransactionWorker.postMessage("hello world");
   }
 
   get blockchain() {
     return this._blockchain;
-    this.ethereumTransactionWorker.postMessage(
-      "lets set the blockchain crawling"
-    );
   }
 
   set blockchain(blockchain) {
@@ -39,20 +20,20 @@ class EthereumService {
   pollEthereum() {
     setTimeout(this.pollEthereum.bind(this), 4000);
     if (!Web3Service.connected()) return;
-
+    // get the current block number if its ahead of ours download it
     Web3Service.getBlockNumber((err, data) => {
       if (err) console.error(err);
       if (!this.blockNumber) {
         for (let i = data - 10; i < data; i++) {
-          this.processBlock(i);
+          this.processBlock(i, true)
         }
-      } else if (this.blockNumber !== data) this.processBlock(data);
+      } else if (this.blockNumber !== data) this.processBlock(data, true);
     });
   }
 
   makePixelsFromHexString(hash) {
     let trimmedHash;
-    if (hash.indexOf("0x") == 0) {
+    if (hash.indexOf("0x") === 0) {
       trimmedHash = hash.substring(2, hash.length);
     } else {
       trimmedHash = hash;
@@ -92,9 +73,13 @@ class EthereumService {
     let bitmap = [];
     let transactionArray = [];
     block.transactions.map(transaction => {
-      let pixelArray = this.makePixelsFromHexString(transaction);
+      let pixelArray
+      let transHash = transaction
+      if( !(transaction instanceof String)) transHash = transaction.hash
+      pixelArray = this.makePixelsFromHexString(transHash);
       bitmap = [...bitmap, ...pixelArray];
       transactionArray.push(pixelArray);
+      return true
     });
 
     if (returnTrans) return transactionArray;
@@ -118,7 +103,7 @@ class EthereumService {
     let y = 0;
 
     pixels.map((pixel, i) => {
-      if (x == dimentions && y == dimentions) return;
+      if (x === dimentions && y === dimentions) return;
 
       if (x > dimentions) {
         x = 0;
@@ -129,6 +114,7 @@ class EthereumService {
 
       ctx.fillStyle = `rgb(${pixel.r}, ${pixel.g}, ${pixel.b} )`;
       ctx.fillRect(x * SCALE, y * SCALE, 1 * SCALE, 1 * SCALE);
+      return true
     });
 
     // let filteredData = Filters.filterCanvas( Filters.grayscale, ctx)
@@ -155,18 +141,30 @@ class EthereumService {
     return Web3Service.web3.eth.getTransaction(transaction, cb);
   }
 
-  processBlock(data) {
+  isTransactionContractCreation( transaction ) {
+    if(transaction instanceof String) return false
+    return( transaction.to === '0x0' || transaction.to === null )
+  }
+
+  checkForcontractCreation(block) {
+    block.transactions.forEach( (transaction) => {
+      if( this.isTransactionContractCreation(transaction) ) transaction.contractCreation = true
+    })
+  }
+
+  processBlock(data, loadTransactions = false) {
     this.blockNumber = data;
 
-    var currBlockObj = Web3Service.web3.eth.getBlock(data, (err, block) => {
+      return( Web3Service.web3.eth.getBlock(data, loadTransactions, (err, block) => {
       if (err) console.error(err);
       if (!block) return;
+      this.checkForcontractCreation( block )
       // let pixels = this.convertBlockToRGB(block)
       // block.image = this.makeBlockImage( pixels )
       block.pixelArray = this.convertBlockToRGB(block, true);
       // block.loadTransaction = this.loadTransaction.bind(this)
       this.addBlock(block);
-    });
+    }))
   }
 }
 

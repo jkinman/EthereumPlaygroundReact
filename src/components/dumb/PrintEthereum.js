@@ -7,6 +7,7 @@ import "./ethereum/ethereum.scss";
 import EthereumService from "../../services/EthereumService";
 
 //components
+import TransactionBlob from "./ethereum/TransactionBlob";
 import BlockEnhanced from "./ethereum/BlockEnhanced";
 import BlockDetails from "./ethereum/BlockDetails";
 import TransactionDetails from "./ethereum/TransactionDetails";
@@ -61,41 +62,56 @@ export default class PrintEthereum extends Component {
     this.selectedElement.zoomIn();
   }
 
+  openInPanel(element) {
+    this.selectedElement = ReactDOM.render(
+      <TransactionBlob {...element.props} />,
+      this.refs.currentElement
+    );
+  }
+
   render() {
     return (
       <div className="index">
-        <h1>Ethereum Blockchain Bitmap Visualization</h1>
-        <h3>
-          The transactions in every block are being concatenated and converted
-          to RGB values and the result is being rendered to a bitmap.
-        </h3>
-        <h3>Click the blocks to inspect</h3>
+        { false && 
+        <div className="row help">
+          <h1>Ethereum Blockchain Bitmap Visualization</h1>
+          <h3>
+            The transactions in every block are being concatenated and converted
+            to RGB values and the result is being rendered to a bitmap.
+          </h3>
+          <h3>Click the blocks to inspect</h3>
 
-        <h3>
-          Each group of squares represents one transaction, each group of
-          transactions is a block.
-        </h3>
-        <p ref="data" />
-
-        <div className="blockContainer">
-          {this.props.ethereum &&
-            this.props.ethereum.blockArray.map((block, i) => {
-              return (
-                <div key={i}>
-                  <BlockEnhanced
-                    select={this.setCurrentContext.bind(this)}
-                    showBlock={this.showDetails.bind(this)}
-                    // toolTipCB={ this.showToolTip.bind(this) }
-                    block={block}
-                    tilt={this.state.hoverId == i}
-                    index={i}
-                    key={i + "block"}
-                  />
-                </div>
-              );
-            })}
+          <h3>
+            Each group of squares represents one transaction, each group of
+            transactions is a block.
+          </h3>
         </div>
-        <div ref="currentElement" />
+        }
+        <p ref="data" />
+        <div className="blockContainer container-fluid">
+          <div className="row">
+            <div className="col-sm-6">
+              {this.props.ethereum &&
+                this.props.ethereum.blockArray.map((block, i) => {
+                  return (
+                    <div className="col-sm-12">
+                      <BlockEnhanced
+                        key={i}
+                        select={this.openInPanel.bind(this)}
+                        showBlock={this.showDetails.bind(this)}
+                        // toolTipCB={ this.showToolTip.bind(this) }
+                        block={block}
+                        tilt={this.state.hoverId == i}
+                        index={i}
+                        key={i + "block"}
+                      />
+                    </div>
+                  );
+                })}
+            </div>
+            <div className="col-sm-6" ref="currentElement" />
+          </div>
+        </div>
       </div>
     );
   }

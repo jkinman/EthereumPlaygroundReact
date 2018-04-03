@@ -16,7 +16,7 @@ class App extends Component {
     return (
       <Provider store={store}>
         <div className="App">
-          <div className="container">
+          <div className="container-fluid">
             <header className="App-header">
               <h1 className="App-title">
                 Welcome to Ethereum React Starter Kit
