@@ -1,23 +1,27 @@
 import React, {Component} from 'react'
 
+// styles
+import './BabylonScene.scss'
+
 // babylon logic
 import BabylonEthereum from './BabylonEthereum'
+
 class BabylonSceneLoader extends Component {
 
 	constructor(props) {
 		super(props)
-		this.scene = new BabylonSceneLoader()
+		this.babylonEth = new BabylonEthereum( this.props )
 	}
 
 	componentDidMount() {
-		BabylonSceneLoader.mount( {canvasId:'babylon-scene'})
+		this.babylonEth.mount( {canvasId:'renderCanvas'})
 	}
 
 	render() {
 
 		return(
 			<div className="babylon-scene-loader">
-				<canvas id="babylon-scene" />
+				<canvas id="renderCanvas" />
 			</div>
 		)
 	}
