@@ -1,5 +1,11 @@
 import React from "react";
 
+// components
+import HUDBox from "./HUDBox";
+
+// style
+import "./HUD.scss";
+
 class HUD extends React.Component {
   constructor(props) {
     super(props);
@@ -14,9 +20,16 @@ class HUD extends React.Component {
   }
 
   render() {
+    const { ethereum } = this.props;
     return (
-      <div>
-        <p ref="info">HUD</p>
+      <div className="HUD">
+        <h1 class="title">ETHEREUM EXPLORER</h1>
+        <div className="panelsTop">
+          <HUDBox
+            title="ETH blocks mined"
+            subtitle={ethereum.latestBlock.number}
+          />
+        </div>
         {this.state.messages.map(message => <p>{message}</p>)}
       </div>
     );
