@@ -11,8 +11,8 @@ class BabylonEthereum {
     this.actions = props.actions;
     this.ethereum = props.ethereum;
     this.ethService = props.ethereumService;
-    let params = new URLSearchParams(document.location.search.substring(1));
-    this.cameraTypeParam = params.get("camera") || "universal";
+
+    this.cameraTypeParam = props.cameraType
   }
 
   mount(opts) {
@@ -137,8 +137,8 @@ class BabylonEthereum {
     scene = new BABYLON.Scene(engine);
     // scene.clearColor = new BABYLON.Color3(0.5, 0.8, 0.5);
     scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3);
-    const cameraStartPos = new BABYLON.Vector3(0, 200, -300)
-    const cameraTarget = new BABYLON.Vector3(100, 0, 0)
+    const cameraStartPos = new BABYLON.Vector3(0, 50, -50)
+    const cameraTarget = new BABYLON.Vector3(200, 0, 0)
     switch (this.cameraTypeParam) {
       case "vr":
         camera = new BABYLON.VRDeviceOrientationFreeCamera(

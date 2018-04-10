@@ -22,19 +22,24 @@ class BabylonBlockExplorer extends Component {
   }
   render() {
     const { actions, ethereum } = this.props;
+    let params = new URLSearchParams(document.location.search.substring(1));
+    let cameraType = params.get("camera") || "universal";
+
     return (
       <div>
         <BabylonSceneLoader
           actions={actions}
           ethereum={ethereum}
-          ethService={this.ethereumService}
+          cameraType={cameraType}
         />
+        { (cameraType != 'vr') && 
         <HUD
           ref="HUD"
           actions={actions}
           ethereum={ethereum}
           ethService={this.ethereumService}
         />
+      }
       </div>
     );
   }
