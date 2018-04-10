@@ -16,7 +16,9 @@ class BabylonSceneLoader extends Component {
 	componentDidMount() {
 		this.babylonEth.mount( {canvasId:'renderCanvas'})
 	}
-
+	componentWillReceiveProps( newProps ){
+		this.babylonEth.newBlock( newProps.ethereum.latestBlock)
+	}
 	render() {
 
 		return(
