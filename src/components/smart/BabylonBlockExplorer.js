@@ -4,11 +4,10 @@ import { connect } from "react-redux";
 import * as ReduxActions from "../../actions";
 import EthereumService from "../../services/EthereumService";
 
-import PrintEthereum from "../dumb/PrintEthereum";
-// import Blockchain from "../three/Blockchain";
-import HUD from '../dumb/HUD'
+import BabylonSceneLoader from "../babylonScene/BabylonSceneLoader";
+import HUD from "../dumb/HUD/HUD";
 
-class PollEthereum extends Component {
+class BabylonBlockExplorer extends Component {
   constructor(props, context) {
     super(props, context);
     this.ethereumService = new EthereumService(this.props.actions.addNewBlock);
@@ -18,27 +17,26 @@ class PollEthereum extends Component {
     this.ethereumService.blockchain = this.props.ethereum;
   }
 
-  showMessage( message ) {
-    console.log(message)
+  showMessage(message) {
+    console.log(message);
   }
   render() {
     const { actions, ethereum } = this.props;
-    return(
-    <div>
-      {/* <Blockchain
-        actions={actions}
-        ethereum={ethereum}
-        ethService={this.ethereumService}
-        showMessage={this.showMessage.bind(this)}
-      /> */}
-      <HUD ref="HUD"/>
-      <PrintEthereum
-        actions={actions}
-        ethereum={ethereum}
-        ethService={this.ethereumService}
-      />
-    </div>
-    )
+    return (
+      <div>
+        <BabylonSceneLoader
+          actions={actions}
+          ethereum={ethereum}
+          ethService={this.ethereumService}
+        />
+        <HUD
+          ref="HUD"
+          actions={actions}
+          ethereum={ethereum}
+          ethService={this.ethereumService}
+        />
+      </div>
+    );
   }
 }
 
@@ -53,4 +51,4 @@ function mapDispatchToProps(dispatch) {
   return actionMap;
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PollEthereum);
+export default connect(mapStateToProps, mapDispatchToProps)(BabylonBlockExplorer);

@@ -9,6 +9,7 @@ import EthereumService from "../../services/EthereumService";
 //components
 import TransactionBlob from "./ethereum/TransactionBlob";
 import BlockEnhanced from "./ethereum/BlockEnhanced";
+import BlockSquare from "./ethereum/BlockSquare";
 import BlockDetails from "./ethereum/BlockDetails";
 import TransactionDetails from "./ethereum/TransactionDetails";
 import BlockInspector from "./ethereum/BlockInspector/BlockInspector";
@@ -88,14 +89,14 @@ export default class PrintEthereum extends Component {
         </div>
         }
         <p ref="data" />
-        <div className="blockContainer container-fluid">
+        <div className="blockContainer container">
           <div className="row">
-            <div className="col-sm-6">
               {this.props.ethereum &&
                 this.props.ethereum.blockArray.map((block, i) => {
                   return (
-                    <div className="col-sm-12">
-                      <BlockEnhanced
+                    <div className="col-sm-6">
+                      {/* <BlockEnhanced */}
+                      <BlockSquare
                         key={i}
                         select={this.openInPanel.bind(this)}
                         showBlock={this.showDetails.bind(this)}
@@ -108,7 +109,6 @@ export default class PrintEthereum extends Component {
                     </div>
                   );
                 })}
-            </div>
             <div className="col-sm-6" ref="currentElement" />
           </div>
         </div>
