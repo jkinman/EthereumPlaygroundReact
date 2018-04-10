@@ -2,11 +2,14 @@
 // Then manages a series of web workers to systematically pull in data that makes up the blocks
 
 import Web3Service from "./Web3Service";
+import EC20Match from './EC20Match'
+import ec20TokenData from './ethTokens.json'
 
 class EthereumService {
   constructor(addBlock) {
     this.addBlock = addBlock;
     this.pollEthereum();
+    this.eC20Match = new EC20Match(ec20TokenData)
   }
 
   get blockchain() {
@@ -163,6 +166,7 @@ class EthereumService {
       // block.image = this.makeBlockImage( pixels )
       block.pixelArray = this.convertBlockToRGB(block, true);
       // block.loadTransaction = this.loadTransaction.bind(this)
+      this.eC20Match.searchBlock( block )
       this.addBlock(block);
     }))
   }
