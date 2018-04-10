@@ -12,12 +12,12 @@
 
 .block {
   h1 {
-    font-size: 12px;
+    font-size: 2em;
   }
 }
 
 .block h2 {
-  font-size: 6px;
+  font-size: 1.5em;
 }
 
 .block img {
@@ -83,8 +83,37 @@
       flex-grow: 1;
       min-height: 20px;
     }
+    .tokenSymbol {
+      width: 2em;
+      height: 2em;
+    }
   }
 }
+
+.blocksquare {
+  background-color: #555;
+  font-size: 6px;
+  color: #fff;
+  margin-bottom: 2em;
+  min-height: 30em;
+  .tokenSymbol {
+    width: 3em;
+    height: 3em;
+  }
+  img {
+    padding: 0;
+    margin: 0;
+  }
+  .transactionsquare {
+  background-color: #888;
+    margin: 0.2em;
+    padding: 0.2em;
+  }
+  h4 {
+    font-size: 2em;
+  }
+}
+
 .DomPixel {
   min-width: 6px;
   min-height: 20px;

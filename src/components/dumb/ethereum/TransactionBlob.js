@@ -15,11 +15,14 @@ class TransactionBlob extends React.Component {
       >
         <div className="row">
           <div className="col">
-            {transaction.contractCreation ? (
+          {transaction.contractCreation ? (
               <h4>contract creation</h4>
             ) : (
               <h4>Transaction</h4>
             )}
+              {transaction.toToken && (<div className="col"><h4>{transaction.toToken.symbol}</h4> <img className="tokenSymbol" src={`https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`} /> </div>)}
+              {transaction.fromToken && (<div className="col"><h4>{transaction.fromToken.symbol}</h4> <img className="tokenSymbol" src={`https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`} /> </div>)}
+
             {/* <p>from: {JSON.stringify(transaction.from)}</p>
           <p>to: {JSON.stringify(transaction.to)}</p>
           <p>value: {JSON.stringify(transaction.value)}</p> */}
