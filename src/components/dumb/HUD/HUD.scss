@@ -1,0 +1,24 @@
+.HUD {
+	pointer-events: none;
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	border: 0.2em solid green;
+	border-radius: 5px;
+	margin: 2vh;
+	z-index: 10000;
+	.HUDBox {
+		font-size: 1vw;
+		height: 10vw;
+		width: 20vw;
+		background-color: rgba( 255, 255, 255, 0.2);
+		margin: 1vw;
+		h1, h2, h3 {
+			padding: 0.25vw;
+			padding-left: 1vw;
+			padding-right: 1vw;
+		}
+	}
+}

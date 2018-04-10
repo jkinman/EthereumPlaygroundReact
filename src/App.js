@@ -1,25 +1,26 @@
-import React, { Component } from 'react';
-import { Provider } from 'react-redux';
+import React, { Component } from "react";
+import { Provider } from "react-redux";
 
+import configureStore from "./stores";
 
-import configureStore from './stores';
-import logo from './logo.svg';
-import './App.css';
-import PollEthereum from './components/smart/PollEthereum';
+import "bootstrap";
+import "./App.css";
+import "./styles/app.scss";
+
+// import Main from "./components/smart/PollEthereum";
+import Main from "./components/smart/BabylonBlockExplorer";
 
 const store = configureStore();
 
 class App extends Component {
   render() {
-
     return (
       <Provider store={store}>
         <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
-          </header>
-          <PollEthereum />
+          <div className="container-fluid">
+            <Main />
+          </div>
+          <div id="spawnedthings" />
         </div>
       </Provider>
     );
