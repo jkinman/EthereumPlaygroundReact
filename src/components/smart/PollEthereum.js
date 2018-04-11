@@ -6,7 +6,7 @@ import EthereumService from "../../services/EthereumService";
 
 import PrintEthereum from "../dumb/PrintEthereum";
 // import Blockchain from "../three/Blockchain";
-import HUD from '../dumb/HUD'
+import HUD from '../dumb/HUD/HUD'
 
 class PollEthereum extends Component {
   constructor(props, context) {
@@ -31,7 +31,12 @@ class PollEthereum extends Component {
         ethService={this.ethereumService}
         showMessage={this.showMessage.bind(this)}
       /> */}
-      <HUD ref="HUD"/>
+        <HUD
+          ref="HUD"
+          actions={actions}
+          ethereum={ethereum}
+          ethService={this.ethereumService}
+        />
       <PrintEthereum
         actions={actions}
         ethereum={ethereum}

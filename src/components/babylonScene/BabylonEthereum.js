@@ -1,6 +1,7 @@
+import * as CANNON from "cannon";
 import * as BABYLON from "babylonjs";
+// import * as BABYLON from '../../../node_modules/babylonjs/es6.js'
 import "babylonjs-materials";
-import "cannon";
 
 let scene;
 let engine;
@@ -12,11 +13,11 @@ class BabylonEthereum {
     this.ethereum = props.ethereum;
     this.ethService = props.ethereumService;
 
-    this.cameraTypeParam = props.cameraType
+    this.cameraTypeParam = props.cameraType;
   }
 
   mount(opts) {
-    this.blocks = []
+    this.blocks = [];
     this.canvasId = opts.canvasId;
     // Get the canvas DOM element
     this.canvas = document.getElementById(this.canvasId);
@@ -26,28 +27,70 @@ class BabylonEthereum {
       stencil: true
     });
 
-    scene = this.createScene(engine, this.canvas);
+    // scene = this.createScene(engine, this.canvas);
+    scene = new BABYLON.Scene(engine);
     engine.runRenderLoop(() => scene.render());
-
     
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene.activeCamera.useAutoRotationBehavior = true;
+    scene.activeCamera.beta -= 0.2;
+
     // this.turnOnGravity();
     // this.configureFog();
-    // this.startPhysics();
-    
+    this.startPhysics();
     // this.loadEnvironment();
+    let helper = scene.createDefaultEnvironment( {
+      sizeAuto: true,
+      // groundSize: 250,
+      groundColor: BABYLON.Color3.Black()
+,    });
+      // helper.setMainColor(BABYLON.Color3.Teal());
+
     // this.createSkyBox();
-    window.addEventListener("resize", engine.resize.bind(this));
+    // window.addEventListener("resize", engine.resize.bind(this));
+
+    scene.debugLayer.show();
+    // window.setInterval(this.makePysicsBox, 500)
+    // for( let i = 0 ; i < 1000 ; i++ ) {
+    //   this.makePysicsBox()
+    // }
+  }
+
+  makePysicsBox() {
+    let sphere = BABYLON.MeshBuilder.CreateSphere(
+      "sphere",
+      { diameter: 10, diameterX: 10 },
+      scene
+    );
+    sphere.physicsImpostor = new BABYLON.PhysicsImpostor(
+      sphere,
+      BABYLON.PhysicsImpostor.SphereImpostor,
+      { mass: 100, restitution: 0.09 },
+      scene
+    );
+    sphere.position.y = 100;
+    sphere.position.x = Math.random();
+    sphere.position.z = Math.random();
+    let myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+
+    myMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    myMaterial.specularColor = new BABYLON.Color3(0.5, 0.6, 0.87);
+    myMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    myMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+
+    sphere.material = myMaterial;
   }
 
   newBlock(block) {
-    let parent = new BABYLON.Mesh.CreateBox(`block${block.number}`, 0, scene)
-    this.blocks.push( parent )
+
+    let parent = new BABYLON.Mesh.CreateBox(`block${block.number}`, 0, scene);
+    this.blocks.push(parent);
     const BLOCKWIDTH = 10;
-    parent.position.x = 0
-    parent.position.y = 0
-    parent.position.z = 0
-    parent.isVisible = false
-    parent.visible = false
+    parent.position.x = 0;
+    parent.position.y = 0;
+    parent.position.z = 0;
+    parent.isVisible = false;
+    parent.visible = false;
     block.transactions.map((transaction, i) => {
       let x = i % BLOCKWIDTH;
       let y = 0;
@@ -55,46 +98,68 @@ class BabylonEthereum {
       let colour = new BABYLON.Color4(`#${transaction.hash.substring(2, 8)}`);
       this.makeTransaction(transaction, { x, y, z }, colour, parent);
     });
-    parent.position.x = this.blocks.length * 30
+    parent.position.x = this.blocks.length * 30;
 
   }
 
   makeTransaction(transaction, position, colour, parent) {
     let height = (transaction.value / 1000000000000000000).toFixed(4);
-    height = Math.min( 100, height)
-    height = Math.max( 1, height)
+    // height = Math.min( 100, height)
+    // height = Math.max( 1, height)
     let block = BABYLON.MeshBuilder.CreateBox(
       "myBox",
       { height: height, width: 2, depth: 2 },
       scene
     );
-    block.emissiveColor = colour;
+    block.diffuseColor = colour;
     block.specularColor = colour;
-    block.position = new BABYLON.Vector3(position.x * 3, height/2, position.z * 3);
-    block.parent = parent
+    block.position = new BABYLON.Vector3(
+      position.x * 3,
+      height / 2,
+      position.z * 3
+    );
+    block.parent = parent;
+
+    let blockImposter = new BABYLON.PhysicsImpostor(
+      block,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 10, restitution: 0.9 },
+      scene
+    );
   }
 
   loadEnvironment() {
     // Create a built-in "ground" shape; its constructor takes 6 params : name, width, height, subdivision, scene, updatable
-    let ground = BABYLON.Mesh.CreateGround("ground1", 50, 50, 2, scene, false);
-    ground.checkCollisions = true;
+    let ground = BABYLON.Mesh.CreateGround(
+      "ground1",
+      1000,
+      1000,
+      2,
+      scene,
+      false
+    );
+    let groundMAterial = new BABYLON.BackgroundMaterial("groundMAterial", scene);
+    ground.material = groundMAterial
+
+    // groundMAterial = true;
     ground.physicsImpostor = new BABYLON.PhysicsImpostor(
       ground,
       BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0, restitution: 0.9 },
+      { mass: 0, restitution: 0.5 },
       scene
     );
   }
 
   startPhysics() {
-    let gravityVector = new BABYLON.Vector3(0, -9.81, 0);
-    let physicsPlugin = new BABYLON.CannonJSPlugin();
-    scene.enablePhysics(gravityVector, physicsPlugin);
+    // let gravityVector = new BABYLON.Vector3(0, -25, 0);
+    // let physicsPlugin = new BABYLON.CannonJSPlugin();
+    // scene.enablePhysics(gravityVector, physicsPlugin);
 
     // scene.enablePhysics()
     // use osimo
-    // scene.enablePhysics(new BABYLON.Vector3(0,-9.81, 0), new BABYLON.OimoJSPlugin());
+    scene.enablePhysics(new BABYLON.Vector3(0,-30, 0), new BABYLON.OimoJSPlugin());
   }
+
   turnOnGravity() {
     scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
     camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
@@ -112,6 +177,7 @@ class BabylonEthereum {
     scene.fogEnd = 600.0;
     scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
   }
+
   createSkyBox() {
     let envTexture = new BABYLON.CubeTexture(
       "/assets/textures/SpecularHDR.dds",
@@ -133,12 +199,13 @@ class BabylonEthereum {
     // skyboxMaterial.reflectionTexture.coordinatesMode =
     //   BABYLON.Texture.SKYBOX_MODE;
   }
+
   createScene(engine, canvas) {
     scene = new BABYLON.Scene(engine);
     // scene.clearColor = new BABYLON.Color3(0.5, 0.8, 0.5);
     scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3);
-    const cameraStartPos = new BABYLON.Vector3(0, 50, -50)
-    const cameraTarget = new BABYLON.Vector3(200, 0, 0)
+    const cameraStartPos = new BABYLON.Vector3(0, 50, -50);
+    const cameraTarget = new BABYLON.Vector3(0, 0, 0);
     switch (this.cameraTypeParam) {
       case "vr":
         camera = new BABYLON.VRDeviceOrientationFreeCamera(

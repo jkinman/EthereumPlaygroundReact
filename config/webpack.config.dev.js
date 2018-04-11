@@ -52,10 +52,10 @@ module.exports = {
     // initialization, it doesn't blow up the WebpackDevServer client, and
     // changing JS code would still trigger a refresh.
   ],
-  externals: {
-    oimo: 'OIMO', //or true
-    cannon: 'CANNON' //or true
-  },
+  // externals: {
+  //   oimo: 'OIMO', //or true
+  //   cannon: 'CANNON' //or true
+  // },
   output: {
     // Add /* filename */ comments to generated require()s in the output.
     pathinfo: true,
@@ -105,6 +105,10 @@ module.exports = {
   module: {
     strictExportPresence: true,
     rules: [
+      {
+        test: require.resolve("babylonjs"),
+        use: "imports-loader?CANNON=cannon"
+    },
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
       // { parser: { requireEnsure: false } },
