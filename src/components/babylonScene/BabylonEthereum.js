@@ -39,11 +39,15 @@ export default class BabylonEthereum extends Component {
     this.cameraFocus.isVisible = false
 
     // This creates and positions a free camera (non-mesh)
-    this.camera = new BABYLON.FreeCamera(
-      "camera1",
-      new BABYLON.Vector3(0, 15, -35),
-      scene
-    );
+    // this.camera = new BABYLON.FreeCamera(
+    //   "camera1",
+    //   new BABYLON.Vector3(0, 15, -35),
+    //   scene
+    // );
+    // this.camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -10), scene);
+    this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, new BABYLON.Vector3(0, 0, 0), scene);
+ this.camera.setPosition(new BABYLON.Vector3(0, 15, -30));
+    this.camera.useAutoRotationBehavior = true;
     this.camera.setTarget(BABYLON.Vector3.Zero());
 
     // this.camera = new BABYLON.FollowCamera(
@@ -106,7 +110,7 @@ export default class BabylonEthereum extends Component {
     // debugger
     
     this.blockMeshes.map( (e) => {
-      if((Date.now() - e.createdAt) > 25000) this.pruneBlockMesh(e)
+      if((Date.now() - e.createdAt) > 35000) this.pruneBlockMesh(e)
     })
   }
 
