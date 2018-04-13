@@ -6,7 +6,7 @@ import BabylonScene from "./BabylonSceneComponent";
 
 
 const BLOCK_DISPLAY_WIDTH = 5
-const Y_DISPLACEMENT = 15
+const Y_DISPLACEMENT = 30
 
 export default class BabylonEthereum extends Component {
   constructor(props) {
@@ -41,7 +41,7 @@ export default class BabylonEthereum extends Component {
     // This creates and positions a free camera (non-mesh)
     this.camera = new BABYLON.FreeCamera(
       "camera1",
-      new BABYLON.Vector3(0, 50, -100),
+      new BABYLON.Vector3(0, 15, -35),
       scene
     );
     this.camera.setTarget(BABYLON.Vector3.Zero());
@@ -103,9 +103,19 @@ export default class BabylonEthereum extends Component {
       //record the block number of the block we just rendered
       this.lastBlockRendered = this.ethereum.blockArray[this.ethereum.blockArray.length-1].number
     }
-    // this.blockMeshes.map( this.pruneBlockMesh)
+    // debugger
+    
+    this.blockMeshes.map( (e) => {
+      if((Date.now() - e.createdAt) > 25000) this.pruneBlockMesh(e)
+    })
   }
 
+  pruneBlockMesh(obj) {
+    obj.meshes.map((mesh) => {
+      mesh.dispose()
+    })
+
+  }
   componentWillReceiveProps(newProps) {
     this.firstBlockRendered = Math.min(this.ethereum.latestBlock.number, this.firstBlockRendered)
   }
@@ -120,7 +130,7 @@ export default class BabylonEthereum extends Component {
       let pos = {}
 
       let xOffset = this.blockMeshes.length * (BLOCK_DISPLAY_WIDTH *2)
-      let x = (index % BLOCK_DISPLAY_WIDTH) + xOffset
+      let x = (index % BLOCK_DISPLAY_WIDTH) //+ xOffset
       let z = Math.floor(index / BLOCK_DISPLAY_WIDTH) % BLOCK_DISPLAY_WIDTH
       let y = Math.floor(z / BLOCK_DISPLAY_WIDTH)
   
@@ -139,9 +149,9 @@ export default class BabylonEthereum extends Component {
   makePhysicsBox( transaction, pos) {
     let value = Math.max(1, (transaction.value / 1000000000000000000).toFixed(4))
     let tokenImage =  fuelImage
-    if( transaction.from ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
-    if( transaction.to ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
-    
+    if( transaction.fromToken ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
+    if( transaction.toToken ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
+
     let box = BABYLON.MeshBuilder.CreateBox(
       transaction.hash,
       {
