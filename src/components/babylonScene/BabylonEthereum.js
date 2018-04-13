@@ -1,4 +1,6 @@
-import React, { Component } from "react";
+import React, {
+  Component
+} from "react";
 import * as BABYLON from "babylonjs";
 
 import fuelImage from "../../images/Etherparty-150x150.png";
@@ -6,7 +8,6 @@ import fuelImage from "../../images/Etherparty-150x150.png";
 import ethImage from "../../images/ethereum_black_logo_sticker.jpg";
 
 import BabylonScene from "./BabylonSceneComponent";
-
 
 const BLOCK_DISPLAY_WIDTH = 5
 const Y_DISPLACEMENT = 30
@@ -23,17 +24,28 @@ export default class BabylonEthereum extends Component {
     this.blocks = [];
     this.firstBlockRendered = Number.MAX_SAFE_INTEGER
   }
+  congfigFog(scene) {
+    scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+    scene.fogDensity = 0.01;
+    scene.fogStart = 20.0;
+    scene.fogEnd = 60.0;
+    scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
 
+  }
   onSceneMount(e) {
-    const { canvas, scene, engine } = e;
+    const {
+      canvas,
+      scene,
+      engine
+    } = e;
     this.scene = scene;
     this.startPhysics(scene);
+    // this.congfigFog(scene)
     // scene.debugLayer.show();
 
     this.blockMeshes = []
     this.cameraFocus = BABYLON.MeshBuilder.CreateBox(
-      'cameraFollow',
-      {
+      'cameraFollow', {
         height: 1,
         width: 1,
         depth: 1
@@ -50,7 +62,7 @@ export default class BabylonEthereum extends Component {
     // );
     // this.camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -10), scene);
     this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, new BABYLON.Vector3(0, 0, 0), scene);
- this.camera.setPosition(new BABYLON.Vector3(0, 15, -30));
+    this.camera.setPosition(new BABYLON.Vector3(0, 15, -30));
     this.camera.useAutoRotationBehavior = true;
     this.camera.setTarget(BABYLON.Vector3.Zero());
 
@@ -85,8 +97,7 @@ export default class BabylonEthereum extends Component {
 
     new BABYLON.PhysicsImpostor(
       ground,
-      BABYLON.PhysicsImpostor.PlaneImpostor,
-      {
+      BABYLON.PhysicsImpostor.PlaneImpostor, {
         mass: 0,
         restitution: 0.1,
         friction: 10,
@@ -99,22 +110,22 @@ export default class BabylonEthereum extends Component {
         scene.render();
       }
     });
-    window.requestAnimationFrame( this.gameLoop.bind(this))
+    window.requestAnimationFrame(this.gameLoop.bind(this))
   }
 
   gameLoop() {
-    window.requestAnimationFrame( this.gameLoop.bind(this))
+    window.requestAnimationFrame(this.gameLoop.bind(this))
 
-    if( this.ethereum.blockArray.length && (this.lastBlockRendered !== this.ethereum.blockArray[this.ethereum.blockArray.length-1].number) ){
+    if (this.ethereum.blockArray.length && (this.lastBlockRendered !== this.ethereum.blockArray[this.ethereum.blockArray.length - 1].number)) {
       // grab the last block and render it
-      this.renderBlock( this.ethereum.blockArray[this.ethereum.blockArray.length-1])
+      this.renderBlock(this.ethereum.blockArray[this.ethereum.blockArray.length - 1])
       //record the block number of the block we just rendered
-      this.lastBlockRendered = this.ethereum.blockArray[this.ethereum.blockArray.length-1].number
+      this.lastBlockRendered = this.ethereum.blockArray[this.ethereum.blockArray.length - 1].number
     }
     // debugger
-    
-    this.blockMeshes.map( (e, i, a) => {
-      if(e && (Date.now() - e.createdAt) > BLOCK_LIFE_SPAN) {
+
+    this.blockMeshes.map((e, i, a) => {
+      if (e && (Date.now() - e.createdAt) > BLOCK_LIFE_SPAN) {
         this.pruneBlockMesh(e, this.scene)
         delete a[i]
       }
@@ -133,41 +144,47 @@ export default class BabylonEthereum extends Component {
     this.firstBlockRendered = Math.min(this.ethereum.latestBlock.number, this.firstBlockRendered)
   }
 
-  renderBlock( block ){
+  renderBlock(block) {
     // get the block number relative to the number of blocks were have rendered in the life of this session
     let relativeBlock = this.firstBlockRendered - (this.ethereum.latestBlock.number || 0) || 0
-    let blockMeshObj = {createdAt: Date.now(), meshes: [], relBlockNumber: relativeBlock}
+    let blockMeshObj = {
+      createdAt: Date.now(),
+      meshes: [],
+      relBlockNumber: relativeBlock
+    }
     //init the slot to store these meshes and timetamp for killing
-    block.transactions.forEach( (transaction, index) => {
+    block.transactions.forEach((transaction, index) => {
 
       let pos = {}
 
-      let xOffset = this.blockMeshes.length * (BLOCK_DISPLAY_WIDTH *2)
+      let xOffset = this.blockMeshes.length * (BLOCK_DISPLAY_WIDTH * 2)
       let x = (index % BLOCK_DISPLAY_WIDTH) //+ xOffset
       let z = Math.floor(index / BLOCK_DISPLAY_WIDTH) % BLOCK_DISPLAY_WIDTH
       let y = Math.floor(z / BLOCK_DISPLAY_WIDTH)
-  
-      let verticalStack = Math.floor( index / (BLOCK_DISPLAY_WIDTH * BLOCK_DISPLAY_WIDTH))
+
+      let verticalStack = Math.floor(index / (BLOCK_DISPLAY_WIDTH * BLOCK_DISPLAY_WIDTH))
       y += verticalStack + Y_DISPLACEMENT
-      
-      blockMeshObj.meshes.push( this.makePhysicsBox(transaction, {x,y,z}))
-      
+
+      blockMeshObj.meshes.push(this.makePhysicsBox(transaction, {
+        x,
+        y,
+        z
+      }))
+
     })
-        //lock the follow cam
-        // debugger
-    this.cameraFocus.position.x = (this.blockMeshes.length+2) * BLOCK_DISPLAY_WIDTH
+    //lock the follow cam
+    // debugger
+    this.cameraFocus.position.x = (this.blockMeshes.length + 2) * BLOCK_DISPLAY_WIDTH
 
-    this.blockMeshes.push( blockMeshObj )
+    this.blockMeshes.push(blockMeshObj)
   }
-  makePhysicsBox( transaction, pos) {
+  makePhysicsBox(transaction, pos) {
     let value = Math.max(1, (transaction.value / 1000000000000000000).toFixed(4))
-    let tokenImage =  ethImage
-    if( transaction.fromToken ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
-    if( transaction.toToken ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
-
+    let tokenImage = ethImage
+    if (transaction.fromToken) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
+    if (transaction.toToken) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
     let box = BABYLON.MeshBuilder.CreateBox(
-      transaction.hash,
-      {
+      transaction.hash, {
         height: 1,
         width: 1,
         depth: 1
@@ -184,11 +201,10 @@ export default class BabylonEthereum extends Component {
     myMaterial.emissiveTexture = new BABYLON.Texture(tokenImage, this.scene);
     myMaterial.ambientTexture = new BABYLON.Texture(tokenImage, this.scene);
     box.material = myMaterial;
-    myMaterial.wireframe = false
+    if (!transaction.fromToken && !transaction.toToken) myMaterial.wireframe = true
     box.physicsImpostor = new BABYLON.PhysicsImpostor(
       box,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      {
+      BABYLON.PhysicsImpostor.BoxImpostor, {
         mass: value,
         restitution: 0.05,
         ignoreParent: true,
@@ -196,7 +212,7 @@ export default class BabylonEthereum extends Component {
       },
       this.scene
     );
-    
+
 
     return box
   }
@@ -215,10 +231,14 @@ export default class BabylonEthereum extends Component {
   }
 
   render() {
-    return (
-      <div className="babylon-scene-loader">
-        <BabylonScene onSceneMount={this.onSceneMount.bind(this)} />{" "}
-      </div>
+    return ( <
+      div className = "babylon-scene-loader" >
+      <
+      BabylonScene onSceneMount = {
+        this.onSceneMount.bind(this)
+      }
+      />{" "} <
+      /div>
     );
   }
 }
