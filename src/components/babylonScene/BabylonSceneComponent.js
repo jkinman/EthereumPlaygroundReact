@@ -1,7 +1,7 @@
 import React from "react";
 import * as BABYLON from "babylonjs";
-
-let scene;
+import './BabylonScene.scss'
+// let scene;
 let engine;
 let canvas;
 
@@ -21,7 +21,7 @@ export default class Scene extends React.Component {
     );
 
     let scene = new BABYLON.Scene(engine);
-    scene = scene;
+    this.scene = scene;
 
     if (typeof this.props.onSceneMount === "function") {
       this.props.onSceneMount({
@@ -59,6 +59,6 @@ export default class Scene extends React.Component {
       opts.height = height;
     }
 
-    return <canvas {...opts} ref={this.onCanvasLoaded} />;
+    return <canvas {...opts} ref={this.onCanvasLoaded} id="renderCanvas"/>;
   }
 }

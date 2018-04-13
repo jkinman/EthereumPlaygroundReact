@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import * as ReduxActions from "../../actions";
 import EthereumService from "../../services/EthereumService";
 
-import BabylonSceneLoader from "../babylonScene/BabylonSceneLoader";
+import BabylonEthereum from "../babylonScene/BabylonEthereum";
 import HUD from "../dumb/HUD/HUD";
 
 class BabylonBlockExplorer extends Component {
@@ -27,7 +27,7 @@ class BabylonBlockExplorer extends Component {
 
     return (
       <div>
-        <BabylonSceneLoader
+        <BabylonEthereum
           actions={actions}
           ethereum={ethereum}
           cameraType={cameraType}
