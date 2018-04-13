@@ -1,7 +1,12 @@
 import React, { Component } from "react";
 import * as BABYLON from "babylonjs";
 
+import fuelImage from "../../images/Etherparty-150x150.png";
 import BabylonScene from "./BabylonSceneComponent";
+
+
+const BLOCK_DISPLAY_WIDTH = 5
+const Y_DISPLACEMENT = 15
 
 export default class BabylonEthereum extends Component {
   constructor(props) {
@@ -12,36 +17,49 @@ export default class BabylonEthereum extends Component {
 
     this.cameraTypeParam = props.cameraType;
     this.blocks = [];
+    this.firstBlockRendered = Number.MAX_SAFE_INTEGER
   }
-
 
   onSceneMount(e) {
     const { canvas, scene, engine } = e;
     this.scene = scene;
     this.startPhysics(scene);
-    scene.debugLayer.show();
+    // scene.debugLayer.show();
+
+    this.blockMeshes = []
+    this.cameraFocus = BABYLON.MeshBuilder.CreateBox(
+      'cameraFollow',
+      {
+        height: 1,
+        width: 1,
+        depth: 1
+      },
+      this.scene
+    );
+    this.cameraFocus.isVisible = false
 
     // This creates and positions a free camera (non-mesh)
-    var camera = new BABYLON.FreeCamera(
+    this.camera = new BABYLON.FreeCamera(
       "camera1",
       new BABYLON.Vector3(0, 50, -100),
       scene
     );
-    camera.setTarget(BABYLON.Vector3.Zero());
-    
-    // var camera = new BABYLON.FollowCamera(
+    this.camera.setTarget(BABYLON.Vector3.Zero());
+
+    // this.camera = new BABYLON.FollowCamera(
     //   "FollowCam",
     //   new BABYLON.Vector3(0, 10, -10),
     //   scene
     // );
-    // camera.radius = 50
-    // camera.heightOffset = 10;
-    // camera.rotationOffset = 0;
-    // camera.cameraAcceleration = 0.005;
-    // camera.maxCameraSpeed = 10;
+    // this.camera.radius = 25
+    // this.camera.heightOffset = 25;
+    // this.camera.rotationOffset = 0;
+    // this.camera.cameraAcceleration = 0.005;
+    // this.camera.maxCameraSpeed = 10;
+    // this.camera.lockedTarget = this.cameraFocus
 
     // This attaches the camera to the canvas
-    camera.attachControl(canvas, true);
+    this.camera.attachControl(canvas, true);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light = new BABYLON.HemisphericLight(
@@ -50,26 +68,10 @@ export default class BabylonEthereum extends Component {
       scene
     );
     light.intensity = 0.7;
-    // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-    var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
-    new BABYLON.PhysicsImpostor(
-      sphere,
-      BABYLON.PhysicsImpostor.SphereImpostor,
-      {
-        mass: 10,
-        restitution: 0.0
-      },
-      scene
-    );
 
-    //lock the follow cam
-    // camera.lockedTarget = sphere;
-
-    // Move the sphere upward 1/2 its height
-    sphere.position.y = 40;
     // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
     var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
-    ground.isVisible = true;
+    ground.isVisible = false;
 
     // this.enviroment = scene.createDefaultEnvironment();
 
@@ -78,7 +80,8 @@ export default class BabylonEthereum extends Component {
       BABYLON.PhysicsImpostor.PlaneImpostor,
       {
         mass: 0,
-        restitution: 0.0
+        restitution: 0.1,
+        friction: 10,
       },
       scene
     );
@@ -88,112 +91,95 @@ export default class BabylonEthereum extends Component {
         scene.render();
       }
     });
-
-    window.setInterval(this.makePysicsBox.bind(this), 3000);
+    window.requestAnimationFrame( this.gameLoop.bind(this))
   }
 
-  makePysicsBox() {
+  gameLoop() {
+    window.requestAnimationFrame( this.gameLoop.bind(this))
+
+    if( this.ethereum.blockArray.length && (this.lastBlockRendered !== this.ethereum.blockArray[this.ethereum.blockArray.length-1].number) ){
+      // grab the last block and render it
+      this.renderBlock( this.ethereum.blockArray[this.ethereum.blockArray.length-1])
+      //record the block number of the block we just rendered
+      this.lastBlockRendered = this.ethereum.blockArray[this.ethereum.blockArray.length-1].number
+    }
+    // this.blockMeshes.map( this.pruneBlockMesh)
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.firstBlockRendered = Math.min(this.ethereum.latestBlock.number, this.firstBlockRendered)
+  }
+
+  renderBlock( block ){
+    // get the block number relative to the number of blocks were have rendered in the life of this session
+    let relativeBlock = this.firstBlockRendered - (this.ethereum.latestBlock.number || 0) || 0
+    let blockMeshObj = {createdAt: Date.now(), meshes: [], relBlockNumber: relativeBlock}
+    //init the slot to store these meshes and timetamp for killing
+    block.transactions.forEach( (transaction, index) => {
+
+      let pos = {}
+
+      let xOffset = this.blockMeshes.length * (BLOCK_DISPLAY_WIDTH *2)
+      let x = (index % BLOCK_DISPLAY_WIDTH) + xOffset
+      let z = Math.floor(index / BLOCK_DISPLAY_WIDTH) % BLOCK_DISPLAY_WIDTH
+      let y = Math.floor(z / BLOCK_DISPLAY_WIDTH)
+  
+      let verticalStack = Math.floor( index / (BLOCK_DISPLAY_WIDTH * BLOCK_DISPLAY_WIDTH))
+      y += verticalStack + Y_DISPLACEMENT
+      
+      blockMeshObj.meshes.push( this.makePhysicsBox(transaction, {x,y,z}))
+      
+    })
+        //lock the follow cam
+        // debugger
+    this.cameraFocus.position.x = (this.blockMeshes.length+2) * BLOCK_DISPLAY_WIDTH
+
+    this.blockMeshes.push( blockMeshObj )
+  }
+  makePhysicsBox( transaction, pos) {
+    let value = Math.max(1, (transaction.value / 1000000000000000000).toFixed(4))
+    let tokenImage =  fuelImage
+    if( transaction.from ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
+    if( transaction.to ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
+    
     let box = BABYLON.MeshBuilder.CreateBox(
-      "box",
+      transaction.hash,
       {
-        height: 2,
-        width: 3,
-        depth: 2
+        height: 1,
+        width: 1,
+        depth: 1
       },
       this.scene
     );
+    box.position.y = pos.y
+    box.position.x = pos.x
+    box.position.z = pos.z
 
+    let myMaterial = new BABYLON.StandardMaterial(`material-${transaction.hash}`, this.scene);
+    myMaterial.diffuseTexture = new BABYLON.Texture(tokenImage, this.scene);
+    myMaterial.specularTexture = new BABYLON.Texture(tokenImage, this.scene);
+    myMaterial.emissiveTexture = new BABYLON.Texture(tokenImage, this.scene);
+    myMaterial.ambientTexture = new BABYLON.Texture(tokenImage, this.scene);
+    box.material = myMaterial;
+    myMaterial.wireframe = false
     new BABYLON.PhysicsImpostor(
       box,
       BABYLON.PhysicsImpostor.BoxImpostor,
       {
-        mass: 1,
-        restitution: 0.02,
-        ignoreParent: true
+        mass: value,
+        restitution: 0.05,
+        ignoreParent: true,
+        friction: 1,
       },
       this.scene
     );
-    // box.position.y = 10;
-    box.position.y = Math.random();
-    box.position.x = Math.random();
-    box.position.z = Math.random();
-    // let myMaterial = new BABYLON.StandardMaterial("myMaterial", this.scene);
+    
 
-    // myMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-    // myMaterial.specularColor = new BABYLON.Color3(0.5, 0.6, 0.87);
-    // myMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
-    // myMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
-
-    // box.material = myMaterial;
-  }
-
-  newBlock(block) {
-    let parent = new BABYLON.Mesh.CreateBox(
-      `block${block.number}`,
-      0,
-      this.scene
-    );
-    this.blocks.push(parent);
-    const BLOCKWIDTH = 10;
-    parent.position.x = 0;
-    parent.position.y = 0;
-    parent.position.z = 0;
-    parent.isVisible = false;
-    parent.visible = false;
-    block.transactions.map((transaction, i) => {
-      let x = i % BLOCKWIDTH;
-      let y = 0;
-      let z = i / BLOCKWIDTH;
-      let colour = new BABYLON.Color4(`#${transaction.hash.substring(2, 8)}`);
-      this.makeTransaction(
-        transaction,
-        {
-          x,
-          y,
-          z
-        },
-        colour,
-        parent
-      );
-    });
-    parent.position.x = this.blocks.length * 30;
-  }
-
-  makeTransaction(transaction, position, colour, parent) {
-    let height = (transaction.value / 1000000000000000000).toFixed(4);
-    // height = Math.min( 100, height)
-    // height = Math.max( 1, height)
-    let block = BABYLON.MeshBuilder.CreateBox(
-      "myBox",
-      {
-        height: height,
-        width: 2,
-        depth: 2
-      },
-      this.scene
-    );
-    block.diffuseColor = colour;
-    block.specularColor = colour;
-    block.position = new BABYLON.Vector3(
-      position.x * 3,
-      height / 2,
-      position.z * 3
-    );
-    block.parent = parent;
-
-    let blockImposter = new BABYLON.PhysicsImpostor(
-      block,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      {
-        mass: 10,
-        restitution: 0.9
-      },
-      this.scene
-    );
+    return box
   }
 
   startPhysics(scene) {
-    let gravityVector = new BABYLON.Vector3(0, -9.8, 0);
+    let gravityVector = new BABYLON.Vector3(0, -20, 0);
     let physicsPlugin = new BABYLON.CannonJSPlugin();
     scene.enablePhysics(gravityVector, physicsPlugin);
 
