@@ -193,7 +193,7 @@ export default class BabylonEthereum extends Component {
   }
 
   startPhysics(scene) {
-    let gravityVector = new BABYLON.Vector3(0, -20, 0);
+    let gravityVector = new BABYLON.Vector3(0, -30, 0);
     let physicsPlugin = new BABYLON.CannonJSPlugin();
     scene.enablePhysics(gravityVector, physicsPlugin);
 
