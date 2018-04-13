@@ -2,11 +2,15 @@ import React, { Component } from "react";
 import * as BABYLON from "babylonjs";
 
 import fuelImage from "../../images/Etherparty-150x150.png";
+// import ethImage from "../../images/eth-black.png";
+import ethImage from "../../images/ethereum_black_logo_sticker.jpg";
+
 import BabylonScene from "./BabylonSceneComponent";
 
 
 const BLOCK_DISPLAY_WIDTH = 5
 const Y_DISPLACEMENT = 30
+const BLOCK_LIFE_SPAN = 45000
 
 export default class BabylonEthereum extends Component {
   constructor(props) {
@@ -109,13 +113,18 @@ export default class BabylonEthereum extends Component {
     }
     // debugger
     
-    this.blockMeshes.map( (e) => {
-      if((Date.now() - e.createdAt) > 35000) this.pruneBlockMesh(e)
+    this.blockMeshes.map( (e, i, a) => {
+      if(e && (Date.now() - e.createdAt) > BLOCK_LIFE_SPAN) {
+        this.pruneBlockMesh(e, this.scene)
+        delete a[i]
+      }
     })
   }
 
-  pruneBlockMesh(obj) {
+  pruneBlockMesh(obj, scene) {
     obj.meshes.map((mesh) => {
+      mesh.geometry.dispose();
+      mesh.material.dispose();
       mesh.dispose()
     })
 
@@ -152,7 +161,7 @@ export default class BabylonEthereum extends Component {
   }
   makePhysicsBox( transaction, pos) {
     let value = Math.max(1, (transaction.value / 1000000000000000000).toFixed(4))
-    let tokenImage =  fuelImage
+    let tokenImage =  ethImage
     if( transaction.fromToken ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
     if( transaction.toToken ) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
 
@@ -176,7 +185,7 @@ export default class BabylonEthereum extends Component {
     myMaterial.ambientTexture = new BABYLON.Texture(tokenImage, this.scene);
     box.material = myMaterial;
     myMaterial.wireframe = false
-    new BABYLON.PhysicsImpostor(
+    box.physicsImpostor = new BABYLON.PhysicsImpostor(
       box,
       BABYLON.PhysicsImpostor.BoxImpostor,
       {
