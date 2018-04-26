@@ -99,7 +99,7 @@ export default class BabylonEthereum extends Component {
       ground,
       BABYLON.PhysicsImpostor.PlaneImpostor, {
         mass: 0,
-        restitution: 0.1,
+        restitution: 0,
         friction: 10,
       },
       scene
@@ -206,9 +206,9 @@ export default class BabylonEthereum extends Component {
       box,
       BABYLON.PhysicsImpostor.BoxImpostor, {
         mass: value,
-        restitution: 0.05,
-        ignoreParent: true,
-        friction: 1,
+        restitution: 0,
+        // ignoreParent: true,
+        friction: 10,
       },
       this.scene
     );
