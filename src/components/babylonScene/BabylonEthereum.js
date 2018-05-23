@@ -39,6 +39,7 @@ export default class BabylonEthereum extends Component {
       engine
     } = e;
     this.scene = scene;
+    this.canvas = canvas;
     this.startPhysics(scene);
     // this.congfigFog(scene)
     // scene.debugLayer.show();
@@ -90,8 +91,10 @@ export default class BabylonEthereum extends Component {
     light.intensity = 0.7;
 
     // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-    var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
+    let ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
+    this.ground = ground
     ground.isVisible = false;
+
 
     // this.enviroment = scene.createDefaultEnvironment();
 
@@ -111,8 +114,73 @@ export default class BabylonEthereum extends Component {
       }
     });
     window.requestAnimationFrame(this.gameLoop.bind(this))
+
+  //   window.addEventListener("click", function (evt) {
+  //     // We try to pick an object
+  //     var pickResult = scene.pick(evt.clientX, evt.clientY);
+  //     console.log( pickResult)
+  //  });
+
+   canvas.addEventListener("pointerdown", this.onPointerDown.bind(this), false);
+   canvas.addEventListener("pointerup", this.onPointerUp.bind(this), false);
+   canvas.addEventListener("pointermove", this.onPointerMove.bind(this), false);
+  this.currentMesh = {}
+  this.startingPoint = 0
   }
 
+   onPointerDown  (evt) {
+    if (evt.button !== 0) {
+        return;
+    }
+
+    // check if we are under a mesh
+    var pickInfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY,  (mesh) => { return mesh !== this.ground; });
+    if (pickInfo.hit) {
+        this.currentMesh = pickInfo.pickedMesh;
+        this.startingPoint = this.getGroundPosition(evt);
+
+        if (this.startingPoint) { // we need to disconnect camera from canvas
+            setTimeout( () => {
+                this.camera.detachControl(this.canvas);
+            }, 0);
+        }
+    }
+}
+
+ onPointerUp  () {
+    if (this.startingPoint) {
+        this.camera.attachControl(this.canvas, true);
+        this.startingPoint = null;
+        return;
+    }
+}
+
+ onPointerMove  (evt) {
+    if (!this.startingPoint) {
+        return;
+    }
+
+    var current = this.getGroundPosition(evt);
+
+    if (!current) {
+        return;
+    }
+
+    var diff = current.subtract(this.startingPoint);
+    this.currentMesh.position.addInPlace(diff);
+
+    this.startingPoint = current;
+
+}
+getGroundPosition  () {
+  // Use a predicate to get position on the ground
+  var pickinfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY,  (mesh) => { return mesh == this.ground; });
+  if (pickinfo.hit) {
+      return pickinfo.pickedPoint;
+  }
+
+  return null;
+}
   gameLoop() {
     window.requestAnimationFrame(this.gameLoop.bind(this))
 
@@ -156,7 +224,7 @@ export default class BabylonEthereum extends Component {
     block.transactions.forEach((transaction, index) => {
 
       // if this transaction didnt get matched with an ERC20 token dont show
-      if( transaction.ERC20 ){
+      // if( transaction.ERC20 ){
 
       let pos = {}
 
@@ -173,7 +241,7 @@ export default class BabylonEthereum extends Component {
         y,
         z
       }))
-    }
+    // }
     })
 
     //lock the follow cam
@@ -185,14 +253,14 @@ export default class BabylonEthereum extends Component {
   makePhysicsBox(transaction, pos) {
     let value = Math.max(1, (transaction.value / 1000000000000000000).toFixed(4))
     let tokenImage = ethImage
-
+    const sizeAdjust = transaction.ERC20 ? 1 : 4
     if (transaction.fromToken) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
     if (transaction.toToken) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
     let box = BABYLON.MeshBuilder.CreateBox(
       transaction.hash, {
-        height: 1,
-        width: 1,
-        depth: 1
+        height: 1 / sizeAdjust,
+        width: 1 / sizeAdjust,
+        depth: 1 / sizeAdjust
       },
       this.scene
     );
