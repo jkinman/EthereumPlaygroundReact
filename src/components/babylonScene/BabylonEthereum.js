@@ -155,6 +155,9 @@ export default class BabylonEthereum extends Component {
     //init the slot to store these meshes and timetamp for killing
     block.transactions.forEach((transaction, index) => {
 
+      // if this transaction didnt get matched with an ERC20 token dont show
+      if( transaction.ERC20 ){
+
       let pos = {}
 
       let xOffset = this.blockMeshes.length * (BLOCK_DISPLAY_WIDTH * 2)
@@ -170,8 +173,9 @@ export default class BabylonEthereum extends Component {
         y,
         z
       }))
-
+    }
     })
+
     //lock the follow cam
     // debugger
     this.cameraFocus.position.x = (this.blockMeshes.length + 2) * BLOCK_DISPLAY_WIDTH
@@ -181,6 +185,7 @@ export default class BabylonEthereum extends Component {
   makePhysicsBox(transaction, pos) {
     let value = Math.max(1, (transaction.value / 1000000000000000000).toFixed(4))
     let tokenImage = ethImage
+
     if (transaction.fromToken) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.from}.png`
     if (transaction.toToken) tokenImage = `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${transaction.to}.png`
     let box = BABYLON.MeshBuilder.CreateBox(
@@ -205,7 +210,7 @@ export default class BabylonEthereum extends Component {
     box.physicsImpostor = new BABYLON.PhysicsImpostor(
       box,
       BABYLON.PhysicsImpostor.BoxImpostor, {
-        mass: value,
+        mass: value / 1000,
         restitution: 0,
         // ignoreParent: true,
         friction: 10,

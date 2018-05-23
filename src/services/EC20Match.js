@@ -10,9 +10,11 @@ class EC20Match {
       this.tokens.forEach(token => {
         if (token.address === transaction.to) {
           transaction.toToken = token;
+          transaction.ERC20 = true
         }
         if (token.address === transaction.from) {
           transaction.fromToken = token;
+          transaction.ERC20 = true
         }
       });
     });
