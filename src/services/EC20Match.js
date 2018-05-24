@@ -1,9 +1,10 @@
 class EC20Match {
-  constructor(data) {
+  constructor(data, addERC20 ) {
     this._tokens = data;
+    this.addERC20 = addERC20
   }
 
-  searchBlock(block) {
+  searchBlock(block, addERC20) {
     let retval = [];
 
     retval = block.transactions.forEach(transaction => {
@@ -11,10 +12,12 @@ class EC20Match {
         if (token.address === transaction.to) {
           transaction.toToken = token;
           transaction.ERC20 = true
+          this.addERC20(token)
         }
         if (token.address === transaction.from) {
           transaction.fromToken = token;
           transaction.ERC20 = true
+          this.addERC20(token)
         }
       });
     });

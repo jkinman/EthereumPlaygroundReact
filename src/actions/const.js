@@ -1,3 +1,4 @@
 export const ADD_NEW_BLOCK = 'ADD_NEW_BLOCK'
 export const LOAD_TRANSACTION = 'LOAD_TRANSACTION'
+export const ADD_ERC20_TOKEN = 'ADD_ERC20_TOKEN'
 

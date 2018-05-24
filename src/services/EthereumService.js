@@ -6,10 +6,10 @@ import EC20Match from './EC20Match'
 import ec20TokenData from './ethTokens.json'
 
 class EthereumService {
-  constructor(addBlock) {
+  constructor(addBlock, addERC20 ) {
     this.addBlock = addBlock;
     this.pollEthereum();
-    this.eC20Match = new EC20Match(ec20TokenData)
+    this.eC20Match = new EC20Match(ec20TokenData, addERC20)
   }
 
   get blockchain() {
@@ -106,7 +106,7 @@ class EthereumService {
     let y = 0;
 
     pixels.map((pixel, i) => {
-      if (x === dimentions && y === dimentions) return;
+      if (x === dimentions && y === dimentions) return true;
 
       if (x > dimentions) {
         x = 0;
@@ -129,7 +129,7 @@ class EthereumService {
   loadTransactions(block) {
     let retVal = [];
     block.transactions.map(transaction => {
-      Web3Service.web3.eth.getTransaction(transaction, (err, data) => {
+       return Web3Service.web3.eth.getTransaction(transaction, (err, data) => {
         if (err) {
           console.error(err);
           return;
