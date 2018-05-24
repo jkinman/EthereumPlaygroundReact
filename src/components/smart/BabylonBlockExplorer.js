@@ -10,7 +10,7 @@ import HUD from "../dumb/HUD/HUD";
 class BabylonBlockExplorer extends Component {
   constructor(props, context) {
     super(props, context);
-    this.ethereumService = new EthereumService(this.props.actions.addNewBlock);
+    this.ethereumService = new EthereumService(this.props.actions.addNewBlock, this.props.actions.addERC20Token);
   }
 
   componentDidMount() {
@@ -32,7 +32,7 @@ class BabylonBlockExplorer extends Component {
           ethereum={ethereum}
           cameraType={cameraType}
         />
-        { (cameraType != 'vr') && 
+        { (cameraType !== 'vr') && 
         <HUD
           ref="HUD"
           actions={actions}
